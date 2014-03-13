@@ -1,32 +1,3 @@
-def crackle
-	(1..100).each do |x|
-		case
-			when (x % 3 == 0) && (x % 5 == 0)
-				puts "CracklePop"
-			when x % 3 == 0
-				puts "Crackle"
-			when x % 5 == 0
-				puts "Pop"
-			else
-				puts "SnaggleFu. Wait until #{x} becomes.."
-			end
-	end
-end
-
-def crackle_two #doesn't work
-	1.upto(100) do |x|
-		if (x % 3 == 0)
-			"CracklePop" if (x % 5 == 0) #doesn't work
-			puts "Crackle"
-		elsif (x % 5 == 0)
-			puts "Pop"
-		else 
-			puts "SnaggleFu. Wait until #{x} becomes.."
-		end
-	end
-end
-
-
 class CracklePop
 	
 	def cracklepop(num)

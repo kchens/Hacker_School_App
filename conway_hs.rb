@@ -21,30 +21,61 @@ class Board
     @to_die = []
     @to_live = []
     fill_board
-    assign_coordinates
+    # assign_coordinates
     seed
     display
     generation(generations)
   end
 
-  def fill_board
-    @grid.each do |array|
-      @size.times do |i|
-        array[i] = Cell.new.tap {|cell| cell.board = self}
+#Whenever you're looping, top-down is outer loop, left-right is inner loop, so
+#"x" value will get you your cell:
+#grid = @grid
+#row = row
+#cell = row[x]
+
+  # def iterate
+  #   @grid.each do |array|
+  #     array.each do |cell|
+  #       yield cell
+  #     end
+  #   end
+  # end
+  
+  def loop_through
+    @grid.each_with_index do |row, y|
+      row.each_with_index do |col, x|
+        yield x,y,row #col 
       end
     end
   end
 
-  def assign_coordinates
-    @grid.each_with_index do |array, y_index|
-      array.each_with_index do |column, x_index|
-        column.tap do |cell|
-          cell.y = y_index
-          cell.x = x_index
-        end
-      end
+  def fill_board
+    loop_through do |x,y,row,col|
+      row[x] = Cell.new
+      row[x].board = self
+      row[x].x = x
+      row[x].y = y
     end
   end
+
+  # def fill_board
+  #   @grid.each do |array|
+  #     @size.times do |i|
+  #       array[i] = Cell.new.tap {|cell| cell.board = self}
+  #     end
+  #   end
+  # end
+
+  # def assign_coordinates
+  #   @grid.each_with_index do |array, y_index|
+  #     array.each_with_index do |column, x_index|
+  #       column.tap do |cell|
+  #         cell.y = y_index
+  #         cell.x = x_index
+  #       end
+  #     end
+  #   end
+  # end
 
   def seed
     num = rand(1..500)
@@ -72,16 +103,8 @@ class Board
     end
   end
 
-  def iterate
-    @grid.each do |array|
-      array.each do |cell|
-        yield cell
-      end
-    end
-  end
-
   def evaluate_cells
-    iterate {|cell| cell.evaluate_neighbors}
+    loop_through {|x, y, cell| cell.evaluate_neighbors}
   end
 
   def tick!
@@ -132,6 +155,10 @@ class Cell
 
   def bottom_edge?
     @y == (board.size - 1)
+  end
+
+  def build_neighbors
+    
   end
 
 
