@@ -1,94 +1,59 @@
-class Game #sets board, knows rules
-  def initialize(size=40, generations=5)
-    @board = Board.new(size, generations)
-  end
-
-  def spawn
-    
-  end
-
-  def death
-    
-  end
-end
-
 class Board
   attr_reader :grid, :size, :to_die, :to_live
 
-  def initialize(size, generations)
+  def initialize(size=40, generations=5)
     @size = size
     @grid = Array.new(size) { Array.new(size)}
+    #@grid.each {|row| row = Array.new(size)}
     @to_die = []
     @to_live = []
     fill_board
-    # assign_coordinates
     seed
     display
     generation(generations)
   end
 
-#Whenever you're looping, top-down is outer loop, left-right is inner loop, so
-#"x" value will get you your cell:
-#grid = @grid
-#row = row
-#cell = row[x]
+  # Whenever you're looping, top-down is outer loop, left-right is inner loop, so the "x" value will get you your cell:
+  # grid = @grid
+  # row = row
+  # cell = row[x]
 
-  # def iterate
-  #   @grid.each do |array|
-  #     array.each do |cell|
-  #       yield cell
-  #     end
-  #   end
-  # end
-  
   def loop_through
     @grid.each_with_index do |row, y|
-      #row.each_with_index do |col, x|
       row.each_index do |x|
-        yield x,y,row #col 
+        yield x, y, row
       end
     end
   end
 
   def fill_board
-    loop_through do |x,y,row| #,col
+    loop_through do |x, y, row|
       row[x] = Cell.new
       row[x].board = self
       row[x].x = x
       row[x].y = y
     end
+
   end
-
-  # def fill_board
-  #   @grid.each do |array|
-  #     @size.times do |i|
-  #       array[i] = Cell.new.tap {|cell| cell.board = self}
-  #     end
-  #   end
-  # end
-
-  # def assign_coordinates
-  #   @grid.each_with_index do |array, y_index|
-  #     array.each_with_index do |column, x_index|
-  #       column.tap do |cell|
-  #         cell.y = y_index
-  #         cell.x = x_index
-  #       end
-  #     end
-  #   end
-  # end
 
   def seed
     num = rand(1..500)
-    num.times do |i|
-      y = rand(1...(size)) #three dots b/c size creates Array.length-1
-      x = rand(1...(size))
-      @grid[y][x].tap {|cell| cell.state = cell.alive}
+    1.upto(num) do |i|
+      y = rand(1...(@size)) #three dots b/c size creates Array.length-1
+      x = rand(1...(@size))
+      cell = @grid[y][x]
+      cell.state = cell.alive
+      #@grid[y][x].tap {|cell| cell.state = cell.alive}
     end
   end
 
   def generation(number)
     number.times do |i|
+      #because Cell's evaluate_neighbors no longer has get_neighbors
+      loop_through do |x, y, row|
+        row[x].get_neighbors
+      end
+
       evaluate_cells
       tick!
       clear_stage
@@ -141,30 +106,13 @@ class Cell
     "o"
   end
 
-  # THESE METHODS CHECK FOR EDGE CELLS
-  # def left_edge?
-  #   @x == 0
-  # end
-
-  # def top_edge?
-  #   @y == 0
-  # end
-
-  # def right_edge?
-  #   @x == (board.size - 1)
-  # end
-
-  # def bottom_edge?
-  #   @y == (board.size - 1)
-  # end
-
   def size
     board.size
   end
 
   def get_neighbors
     low_x = (@x == 0) ? 0 : @x - 1
-    high_x = (@x == size - 1) ? size - 1 : @x + 1
+    high_x = (x == size - 1) ? size - 1 : @x + 1
 
     low_y = (@y == 0) ? 0 : @y - 1
     high_y = (@y == size - 1) ? size - 1 : @y + 1
@@ -179,8 +127,9 @@ class Cell
   end
 
   def evaluate_neighbors
-    get_neighbors
-    
+    #get_neighbors
+    #puts "l = #{@neighbors.length}"
+
     neighbor_states = @neighbors.collect do |cell|
       cell.state
     end  
@@ -202,10 +151,10 @@ class Cell
           board.to_die << self
         end
     end  
-    neighbor_states.clear #= []
-    @neighbors.clear #= []
+    neighbor_states = []
+    @neighbors = []
   end
     
 end
 
-board = Game.new
+board = Board.new
