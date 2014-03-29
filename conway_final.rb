@@ -1,17 +1,7 @@
-# class Ruleset
-#   attr_reader :born_count, :stay_alive_count
-
-#   def initialize(born_count = [3], stay_alive_count = [2,3])
-#     @born_count = born_count
-#     @stay_alive_count = stay_alive_count
-#   end
-# end
-
 class Board
   attr_reader :grid, :size, :die, :live, :ruleset
 
-  def initialize(size=40, generations=10) #could try: (, ruleset=[2,3])
-    #@ruleset = Ruleset.new(ruleset.max, ruleset) -- look at fated_neighbors
+  def initialize(size=40, generations=10)
     @size = size
     @grid = Array.new(size) { Array.new(size)}
     @die = []
@@ -44,9 +34,9 @@ class Board
   end
 
   def seed
-    num = rand(1..(size*15)) #changed the max to a multiple
+    num = rand(1..(size*15)) 
     num.times do |i|
-      y = rand(1...(@size)) #three dots b/c size creates Array.length-1
+      y = rand(1...(@size)) 
       x = rand(1...(@size))
       cell = @grid[y][x]
       cell.state = cell.alive
@@ -65,8 +55,8 @@ class Board
       fated_cells
       switch_clear
       display
-      puts "Generation #{i}"  #new 
-      break puts "All dead" if barren?  #new
+      puts "Generation #{i}" 
+      break puts "All dead" if barren? 
       sleep(1)
     end
   end
@@ -75,17 +65,16 @@ class Board
     loop_through {|x, y, cell| cell[x].fated_neighbors}
   end
 
-  def switch_clear #changed the logic
+  def switch_clear 
     die.each { |cell| cell.state = cell.dead }
 
     live.each { |cell| cell.state = cell.alive }
     
-    #clears holding areas
     die.clear
     live.clear
   end
 
-  def barren? #new
+  def barren?
     loop_through do |x, y, cell| 
       return false if cell[x].alive?
     end
@@ -139,8 +128,6 @@ class Cell
 
   def fated_neighbors
 
-    # born_count = board.ruleset.born_count
-    # stay_alive_count = board.ruleset.stay_alive_count
     born_count = [3]
     stay_alive_count = [2,3]
 
